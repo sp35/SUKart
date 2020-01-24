@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <form action="{% url 'populate-products' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+      <input type="file" title="Upload excel file" name="excel_file" required="required">
+      <p>
+        <input type="submit" value="Upload Product Sheet">
+      </p>
+  </form>
+  <hr>
+  <table  style="width:100%">
+    <tr>
+      {% for col in excel_data.0 %}
+      <th>{{ col }}</th>
+      {% endfor %}
+    </tr>
+    {% for row in excel_data|slice:"1:" %}
+      <tr>
+      {% for cell in row %}
+        <td>{{ cell }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock content %}

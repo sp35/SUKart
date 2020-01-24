@@ -22,4 +22,5 @@ urlpatterns = [
     path('order/<int:pk>/add/complaint/', kart_views.add_complaint, name='add-complaint'),
     path('order/<int:pk>/view/complaints/', kart_views.view_order_complaints, name='view-order-complaints'),
     path('order/<int:pk>/cancel/', kart_views.cancel_order, name='order-cancel'),
+    path('populate/products', kart_views.populate_products, name='populate-products'),
 ]

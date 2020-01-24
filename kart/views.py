@@ -3,9 +3,10 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from datetime import datetime
+import xlrd
 
 from .forms import DeliveryAgentSignUpForm, ShoppingUserSignUpForm, SearchForm, AddComplaintForm
-from .models import Product, ShoppingUser, DeliveryAgent, Order, Complaint
+from .models import Product, ShoppingUser, DeliveryAgent, Order, Complaint, Company
 from . import sendgrid_mail
 
 
@@ -67,6 +68,8 @@ def home(request):
 			products = Product.objects.all()
 		currency = ShoppingUser.objects.get(user=request.user).currency
 		return render(request, "kart/shopping_user_home.html", {'products': products, 'currency': currency, 's_form': s_form})
+	elif request.user.is_superuser:
+		return render(request, 'kart/admin_home.html')
 	return redirect('login')
 
 
@@ -263,3 +266,29 @@ def cancel_order(request, pk):
 			return redirect('view-order', pk=pk)
 	except Order.DoesNotExist:
 		return HttpResponse("Order Does Not Exist")
+
+
+@login_required
+def populate_products(request):
+	if not request.user.is_superuser:
+		return PermissionDenied()
+	if request.method == "GET":
+		return render(request, 'kart/admin_home.html')
+	else:
+		excel_file = request.FILES['excel_file']
+		wb = xlrd.open_workbook(file_contents=excel_file.read())
+		sheet = wb.sheet_by_index(0)
+		excel_data = []
+		for row in range(sheet.nrows):
+			row_data = []
+			for col in range(sheet.ncols):
+				if sheet.cell(row, col).ctype == xlrd.XL_CELL_NUMBER:
+					row_data.append(int(sheet.cell_value(row, col)))
+				else:
+					row_data.append(str(sheet.cell_value(row, col)))
+			excel_data.append(row_data)
+		for row in excel_data[1:]:
+			company, created = Company.objects.get_or_create(name=row[4])
+			Product.objects.get_or_create(title=row[1], description=row[2], price=int(row[3]), company=company)
+
+	return render(request, 'kart/admin_home.html', {"excel_data": excel_data})
