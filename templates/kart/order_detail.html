@@ -40,4 +40,10 @@
 			{% endif %}
 		</p>
 	{% endif %}
+	{% if user.is_shopping_user %}
+		{% if not order.delivered %}
+			<a href="{% url 'order-cancel' order.pk %}"><button class="small">Cancel Order</button></a>
+		{% endif %}
+		<a href="{% url 'add-complaint' order.pk %}"><button class="small">Have a complaint?</button></a>
+	{% endif %}
 {% endblock content %}

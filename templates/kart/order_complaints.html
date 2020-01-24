@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+	{% for complaint in complaints %}
+		<li>
+			On: {{ complaint.complaint_datetime }}
+			{% if complaint.is_resolved %}
+				<strong><br>Resolved</strong>
+			{% endif %}
+		<p>
+			Content: {{ complaint.content }}
+		</p>
+		</li>
+	{% empty %}
+		<h5><br><br>No Complaints Found</h5>
+	{% endfor %}
+{% endblock content %}

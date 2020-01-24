@@ -68,3 +68,13 @@ class Order(models.Model):
 
 	def __str__(self):
 		return f"{self.shopping_user.user.username}"
+
+
+class Complaint(models.Model):
+	order = models.ForeignKey(Order, on_delete=models.CASCADE)
+	content = models.TextField(max_length=200)
+	complaint_datetime = models.DateTimeField(auto_now_add=True)
+	is_resolved = models.BooleanField(default=False)	# true if shopping user's complaint is resolved
+
+	def __str__(self):
+		return f"from {self.order.shopping_user.user.username}"

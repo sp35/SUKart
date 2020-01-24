@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from datetime import datetime
 
-from .forms import DeliveryAgentSignUpForm, ShoppingUserSignUpForm, SearchForm
-from .models import Product, ShoppingUser, DeliveryAgent, Order
+from .forms import DeliveryAgentSignUpForm, ShoppingUserSignUpForm, SearchForm, AddComplaintForm
+from .models import Product, ShoppingUser, DeliveryAgent, Order, Complaint
 from . import sendgrid_mail
 
 
@@ -96,10 +96,33 @@ def order(request, pk):
 	if shopping_user.currency < product.price:
 		messages.warning(request, 'Insufficient Balance')
 	else:
-		Order.objects.create(product=product, shopping_user=shopping_user, delivery_agent=DeliveryAgent.objects.first())
-		messages.success(request, "Ordered Successfully")
+		# delivery agent algorithm
+		delivery_agents = DeliveryAgent.objects.filter(user__state=request.user.state)
+		if len( delivery_agents.filter(user__city=request.user.city) ):
+			delivery_agents = delivery_agents.filter(user__city=request.user.city)
+			d_dict = { delivery_agent: len( Order.objects.filter(delivery_agent=delivery_agent, delivered=False) ) for delivery_agent in delivery_agents }
+			sorted_d_dict = {}
+			for k in sorted(d_dict, key=lambda k: d_dict[k]):
+				sorted_d_dict[k] = d_dict[k]
+			d_dict = sorted_d_dict
+			delivery_agents = list(d_dict.keys())
+		else:
+			delivery_agents = delivery_agents.exclude(user__city=request.user.city)
+			d_dict = { delivery_agent: len( Order.objects.filter(delivery_agent=delivery_agent, delivered=False) ) for delivery_agent in delivery_agents }
+			sorted_d_dict = {}
+			for k in sorted(d_dict, key=lambda k: d_dict[k]):
+				sorted_d_dict[k] = d_dict[k]
+			d_dict = sorted_d_dict
+			delivery_agents = list(d_dict.keys())
 
-	return redirect('home')
+		if len(delivery_agents):
+			delivery_agent = delivery_agents[0]
+			Order.objects.create(product=product, shopping_user=shopping_user, delivery_agent=delivery_agent)
+			messages.success(request, "Ordered Successfully")
+			return redirect('home')
+		else:
+			messages.error(request, "Error: No delivery agent found for this order")
+	return redirect('view-product', pk=pk)
 
 
 @login_required
@@ -190,3 +213,53 @@ def my_orders(request):
 	orders = Order.objects.filter(shopping_user=ShoppingUser.objects.get(user=request.user)).order_by('-order_datetime')
 
 	return render(request, 'kart/orders.html', {'orders': orders})
+
+
+@login_required
+def add_complaint(request, pk):
+	if not request.user.is_shopping_user:
+		return PermissionDenied()
+	try:
+		order = Order.objects.get(pk=pk)
+	except Order.DoesNotExist:
+		return HttpResponse("Order Does Not Exist")
+	if request.method == 'POST':
+		form = AddComplaintForm(request.POST)
+		if form.is_valid():
+			content = form.cleaned_data['content']
+			Complaint.objects.create(order=order, content=content)
+			return redirect('view-order', pk=pk)
+	else:
+		form = AddComplaintForm()
+
+	return render(request, 'kart/complaint_form.html', {'form': form, 'pk': pk})
+
+
+@login_required
+def view_order_complaints(request, pk):
+	if not request.user.is_shopping_user:
+		return PermissionDenied()
+	try:
+		order = Order.objects.get(pk=pk)
+	except Order.DoesNotExist:
+		return HttpResponse("Order Does Not Exist")
+	complaints = Complaint.objects.filter(order=order).order_by('-complaint_datetime')
+
+	return render(request, 'kart/order_complaints.html', {'complaints': complaints})
+
+
+@login_required
+def cancel_order(request, pk):
+	if not request.user.is_shopping_user:
+		return PermissionDenied()
+	try:
+		order = Order.objects.get(pk=pk)
+		if not order.delivered:
+			order.delete()
+			messages.success(request, "Order Cancelled")
+			return redirect('home')
+		else:
+			messages.error(request, "Order can't be cancelled now")
+			return redirect('view-order', pk=pk)
+	except Order.DoesNotExist:
+		return HttpResponse("Order Does Not Exist")

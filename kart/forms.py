@@ -2,7 +2,7 @@ from django import forms
 from django.db import transaction
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import User, DeliveryAgent, ShoppingUser
+from .models import User, DeliveryAgent, ShoppingUser, Complaint
 
 
 class DeliveryAgentSignUpForm(UserCreationForm):
@@ -35,3 +35,9 @@ class ShoppingUserSignUpForm(UserCreationForm):
 
 class SearchForm(forms.Form):
     query = forms.CharField(max_length=20, required=False, label="", widget=forms.TextInput(attrs={'placeholder': 'Search by name'}))
+
+
+class AddComplaintForm(forms.ModelForm):
+    class Meta:
+         model = Complaint
+         fields = ['content']

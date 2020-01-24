@@ -11,5 +11,5 @@
 	    </p>
 	    Sold by: {{ product.company.name }}
 	</p>
-	<a href="{% url 'order' product.pk %}">Buy</a>
+	<a href="{% url 'order' product.pk %}"><button class="small">Buy</button></a>
 {% endblock content %}
