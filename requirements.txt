@@ -2,7 +2,6 @@ asgiref==3.2.3
 Django==3.0.2
 django-crispy-forms==1.8.1
 Pillow==7.0.0
-pkg-resources==0.0.0
 python-http-client==3.2.4
 pytz==2019.3
 sendgrid==6.1.0
