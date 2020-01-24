@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE HTML>
+<!--
+	Phantom by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>SU Kart</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="{% static 'home_template/assets/css/main.css' %}" />
+		<noscript><link rel="stylesheet" href="{% static 'home_template/assets/css/noscript.css' %}" /></noscript>
+
+		<link rel="stylesheet" href="{% static 'home_template/collapse.css' %}" />
+	</head>
+	<body class="is-preload">
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="inner">
+
+							<!-- Logo -->
+								{% if user.is_authenticated %}
+									<a href="{% url 'home' %}" class="logo">
+								{% else %}
+									<a href="{% url 'index' %}" class="logo">
+								{% endif %}
+										<span class="symbol"><img src="{% static 'home_template/images/logo.svg' %}" alt="" /></span><span class="title">SU Kart</span>
+									</a>
+
+							<!-- Nav -->
+								<nav>
+									<ul>
+										<li><a href="#menu">Menu</a></li>
+									</ul>
+								</nav>
+
+						</div>
+					</header>
+
+				<!-- Menu -->
+					<nav id="menu">
+						<h2>Menu</h2>
+						<ul>
+							{% if user.is_authenticated %}
+								<li><a href="{% url 'home' %}">Home</a></li>
+								{% if user.is_delivery_agent %}
+									<li><a href="{% url 'view-accepted-orders' %}">Accepted Orders</a></li>
+									<li><a href="{% url 'view-arrived-orders' %}">Arrived Orders</a></li>
+									<li><a href="{% url 'view-delivered-orders' %}">Delivered Orders</a></li>
+								{% elif user.is_shopping_user %}
+									<li><a href="{% url 'my-orders' %}">My Orders</a></li>
+								{% endif %}
+								<li><a href="{% url 'logout' %}">Logout {{ user.username }}</a></li>
+							{% else %}
+								<li><a href="{% url 'index' %}">SU Kart</a></li>
+							{% endif %}
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+							<!-- <header> -->
+							{% if messages %}
+					          {% for message in messages %}
+					            <div class="alert alert-{{ message.tags }}">
+					              {{ message }}
+					            </div>
+					          {% endfor %}
+					        {% endif %}
+							{% block content %}
+							{% endblock content %}
+						</div>
+					</div>
+
+				<!-- Footer -->
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="{% static 'home_template/assets/js/jquery.min.js' %}"></script>
+			<script src="{% static 'home_template/assets/js/browser.min.js' %}"></script>
+			<script src="{% static 'home_template/assets/js/breakpoints.min.js' %}"></script>
+			<script src="{% static 'home_template/assets/js/util.js' %}"></script>
+			<script src="{% static 'home_template/assets/js/main.js' %}"></script>
+
+			<script src="{% static 'home_template/collapse.js' %}"></script>
+
+	</body>
+</html>

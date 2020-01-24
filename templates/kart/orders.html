@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <section class="tiles">
+    {% for order in orders %}
+      <article>
+        <span class="image">
+          <img src="{{ order.product.image.url }}" alt="Image Error" height="300" width="100"/>
+        </span>
+        <a href="{% url 'view-order' order.pk %}">
+          <h2>{{ order.product.title }}</h2>
+          <div class="content">
+            <p>
+              @Rs {{ order.product.price }} <br>
+              {{ order.product.description|slice:150 }}<br>
+              Sold by: {{ order.product.company.name }}
+            </p>
+          </div>
+        </a>
+      </article>
+    {% empty %}
+      <h5><br><br>No orders found</h5>
+    {% endfor %}
+  </section>
+{% endblock content %}

@@ -1,0 +1,18 @@
+{% extends 'main.html' %}
+
+{% block content %}
+	<h1><em>Welcome to SU Kart</em></h1>
+	<br>
+	<ul id="ul_hor">
+		<li>
+			<h5>New here?</h5>
+			<a href="{% url 'signup' %}" class='btn btn-primary btn-lg'>SignUp</a>
+		</li>
+		<br>
+		<br>
+		<li>
+			<h5>Already have an account?</h5>
+			<a href="{% url 'login' %}"  class='btn btn-primary btn-lg'>Login</a>
+		</li>
+	</ul>
+{% endblock %}

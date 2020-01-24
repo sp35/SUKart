@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+	<p>
+		<figure>
+			<img src="{{ product.image.url }}" height="300", width="300" alt="Image not found">
+			<figcaption><h3>{{ product.title }}</h3></figcaption>
+		</figure>
+	    @ Rs {{ product.price }}
+	    <p>
+	    	{{ product.description }}
+	    </p>
+	    Sold by: {{ product.company.name }}
+	</p>
+	<a href="{% url 'order' product.pk %}">Buy</a>
+{% endblock content %}

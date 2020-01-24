@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+	<p>
+		<figure>
+			<img src="{{ order.product.image.url }}" height="300", width="300" alt="Image not found">
+			<figcaption><h3>{{ order.product.title }}</h3></figcaption>
+			<p>
+				Ordered on {{ order.order_datetime }}<br>
+				{% if order.delivered %}
+					Delivered on {{ order.delivered_datetime }}
+				{% endif %}
+			</p>
+		</figure>
+	    @ Rs {{ order.product.price }}
+	    <p>
+	    	{{ order.product.description }}
+	    </p>
+	    Sold by: {{ order.product.company.name }}
+	</p>
+	{% if user.is_delivery_agent %}
+		<p>
+			{% if order.accepted %}
+				Accepted
+			{% else %}
+				<a href="{% url 'order-accepted' order.pk %}"><button class="small">Accept this order</button></a>
+			{% endif %}
+		</p>
+		<p>
+			{% if order.arrived %}
+				Notified as arrived
+			{% else %}
+				<a href="{% url 'order-arrived' order.pk %}"><button class="small">Notify user as arrived</button></a>
+			{% endif %}
+		</p>
+		<p>	
+			{% if order.delivered %}
+				Notified as delivered
+			{% else %}
+				<a href="{% url 'order-delivered' order.pk %}"><button class="small">Notify user as delivered</button></a>
+			{% endif %}
+		</p>
+	{% endif %}
+{% endblock content %}

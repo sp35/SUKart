@@ -1,0 +1,18 @@
+{% extends 'main.html' %}
+
+{% block content %}
+	<h1><em>SignUp for SU Kart</em></h1>
+	<br>
+	<ul id="ul_hor">
+		<li>
+			<h5>As a shopping user?</h5>
+			<a href="{% url 'signup-shopping-user' %}" class='btn btn-primary btn-lg'>I Shop</a>
+		</li>
+		<br>
+		<br>
+		<li>
+			<h5>As a delivery agent?</h5>
+			<a href="{% url 'signup-delivery-agent' %}"  class='btn btn-primary btn-lg'>I Deliver</a>
+		</li>
+	</ul>
+{% endblock %}
