@@ -5,4 +5,3 @@ db.sqlite3
 /media
 .DS_Store
 sendgrid.env
-*/migrations
