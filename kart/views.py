@@ -102,8 +102,8 @@ def order(request, pk):
 	else:
 		# delivery agent algorithm
 		delivery_agents = DeliveryAgent.objects.filter(user__state=request.user.state)
-		if len( delivery_agents.filter(user__city=request.user.city) ):
-			delivery_agents = delivery_agents.filter(user__city=request.user.city)
+		if len( delivery_agents.filter(user__city__iexact=request.user.city) ):
+			delivery_agents = delivery_agents.filter(user__city__iexact=request.user.city)
 			d_dict = { delivery_agent: len( Order.objects.filter(delivery_agent=delivery_agent, delivered=False) ) for delivery_agent in delivery_agents }
 			sorted_d_dict = {}
 			for k in sorted(d_dict, key=lambda k: d_dict[k]):
@@ -111,7 +111,7 @@ def order(request, pk):
 			d_dict = sorted_d_dict
 			delivery_agents = list(d_dict.keys())
 		else:
-			delivery_agents = delivery_agents.exclude(user__city=request.user.city)
+			delivery_agents = delivery_agents.exclude(user__city__iexact=request.user.city)
 			d_dict = { delivery_agent: len( Order.objects.filter(delivery_agent=delivery_agent, delivered=False) ) for delivery_agent in delivery_agents }
 			sorted_d_dict = {}
 			for k in sorted(d_dict, key=lambda k: d_dict[k]):
