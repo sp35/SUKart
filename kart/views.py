@@ -78,7 +78,8 @@ def view_product(request, pk):
 	if not request.user.is_shopping_user:
 		return PermissionDenied()
 	product = Product.objects.get(pk=pk)
-	return render(request, "kart/product_detail.html", {'product': product})
+	currency = ShoppingUser.objects.get(user=request.user).currency
+	return render(request, "kart/product_detail.html", {'product': product, "currency": currency})
 
 
 @login_required
@@ -121,6 +122,8 @@ def order(request, pk):
 		if len(delivery_agents):
 			delivery_agent = delivery_agents[0]
 			Order.objects.create(product=product, shopping_user=shopping_user, delivery_agent=delivery_agent)
+			shopping_user.currency -= product.price
+			shopping_user.save()
 			messages.success(request, "Ordered Successfully")
 			return redirect('home')
 		else:

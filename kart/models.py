@@ -24,7 +24,7 @@ class DeliveryAgent(models.Model):
 
 class ShoppingUser(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	currency = models.PositiveIntegerField(default=0)
+	currency = models.PositiveIntegerField(default=5000)
 
 	def __str__(self):
 		return self.user.username
